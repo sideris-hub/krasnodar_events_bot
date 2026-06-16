@@ -1,0 +1,14 @@
+venv/
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+logs/
+__pycache__/
+*.pyc
+*.pyo

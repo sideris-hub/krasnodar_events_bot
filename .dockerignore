@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+venv/
+logs/
+*.session
+*.session-journal
+*.db
+__pycache__/
+*.pyc
+.git/
