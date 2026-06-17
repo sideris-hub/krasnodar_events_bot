@@ -87,3 +87,36 @@ def count_events() -> int:
         return conn.execute("SELECT COUNT(*) FROM events").fetchone()[0]
     finally:
         conn.close()
+
+
+def get_unclassified(limit: int = 200) -> list[dict]:
+    """События, которые ещё не прошли AI-фильтр (relevant IS NULL)."""
+    conn = get_conn()
+    try:
+        rows = conn.execute(
+            "SELECT * FROM events WHERE relevant IS NULL ORDER BY id LIMIT ?", (limit,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def set_classification(
+    event_id: int, relevant: int, category: str | None = None, is_free: bool | None = None
+) -> None:
+    """Записать результат AI-фильтра. is_free=True проставляет price_hint='free'."""
+    conn = get_conn()
+    try:
+        if is_free is True:
+            conn.execute(
+                "UPDATE events SET relevant = ?, category = ?, price_hint = 'free' WHERE id = ?",
+                (relevant, category, event_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE events SET relevant = ?, category = ? WHERE id = ?",
+                (relevant, category, event_id),
+            )
+        conn.commit()
+    finally:
+        conn.close()
